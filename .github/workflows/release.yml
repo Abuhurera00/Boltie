@@ -1,0 +1,82 @@
+# Push a tag like v0.1.0 to build installers and publish a GitHub release.
+# Asset names are fixed (no version in them) so the README and the website can
+# link straight to releases/latest/download/<name>.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: windows-x64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            label: macos-arm64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            label: macos-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @boltie/desktop tauri build --target ${{ matrix.target }}
+
+      - name: Collect installers
+        shell: bash
+        run: |
+          mkdir out
+          bundle="target/${{ matrix.target }}/release/bundle"
+          case "${{ matrix.label }}" in
+            windows-*)
+              cp "$bundle"/nsis/*-setup.exe "out/Boltie-${{ matrix.label }}-setup.exe"
+              cp "$bundle"/msi/*.msi "out/Boltie-${{ matrix.label }}.msi"
+              ;;
+            macos-*)
+              cp "$bundle"/dmg/*.dmg "out/Boltie-${{ matrix.label }}.dmg"
+              ;;
+          esac
+          ls -l out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.label }}
+          path: out/*
+
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: out/*
+          generate_release_notes: true

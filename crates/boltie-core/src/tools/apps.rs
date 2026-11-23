@@ -30,6 +30,15 @@ impl OpenInEditor {
     pub fn execute(&self, ctx: &ToolContext) -> ToolOutput {
         let path = expand_home(&self.path);
         let Some(editor) = sys::which(&ctx.config.editor) else {
+            // On macOS VS Code works without the `code` shim through `open -a`.
+            if cfg!(target_os = "macos") && ctx.config.editor == "code" {
+                let arg = display_path(&path);
+                let args = ["-a", "Visual Studio Code", arg.as_str()];
+                return match sys::spawn_detached(&PathBuf::from("open"), &args, None) {
+                    Ok(()) => ToolOutput::ok(format!("opened {arg} in VS Code")),
+                    Err(e) => ToolOutput::err(format!("could not open VS Code: {e}")),
+                };
+            }
             return ToolOutput::err(format!(
                 "editor `{}` is not on PATH. In VS Code run \"Shell Command: Install 'code' command in PATH\".",
                 ctx.config.editor
@@ -126,6 +135,7 @@ fn resolve(raw: &str) -> Result<Launch, String> {
         }
     } else if cfg!(target_os = "macos") {
         match alias {
+            "code" => return Ok(Launch::ByName("Visual Studio Code".into())),
             "docker-desktop" => return Ok(Launch::ByName("Docker".into())),
             "terminal" => return Ok(Launch::ByName("Terminal".into())),
             "files" => return Ok(Launch::ByName("Finder".into())),

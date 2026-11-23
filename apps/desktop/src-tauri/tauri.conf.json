@@ -12,6 +12,7 @@
   },
   "app": {
     "withGlobalTauri": false,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
@@ -46,6 +47,10 @@
     ],
     "resources": {
       "../../../skills/*.md": "skills/"
+    },
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-"
     }
   }
 }

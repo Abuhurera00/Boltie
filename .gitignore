@@ -1,11 +1,17 @@
 /target
 node_modules/
+.pnpm-store/
 dist/
 .astro/
+.next/
+out/
+.taste-skill/
+shots/
 apps/desktop/src-tauri/gen/
 .env
 .env.*
 *.log
+*.tsbuildinfo
 .DS_Store
 vault/.obsidian/workspace*.json
 vault/.obsidian/cache

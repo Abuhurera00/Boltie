@@ -25,13 +25,17 @@ Rule: one line per thing you can actually ship and check. If a line takes more t
 - [x] right-click menu: talk, settings, fly back down, hide, quit
 - [x] multi-monitor: flies across to the next screen, hotkey brings him to the cursor's screen
 - [x] pick a screen to keep him on (settings or right-click > Screen), or let him roam. saved by display name
+- [x] Next.js marketing site with the real bolt logo, animated robot, product UI and responsive motion
+- [x] dark landing redesign with Motion parallax, bundled typography, interactive demos and responsive robot camera
 - [ ] run it end to end on Windows with a real key and record the demo gif
-- [ ] check the same on macOS
+- [ ] check the same on a real Mac (built in CI only so far: hit regions and cursor coords on Retina are untested)
 - [ ] check on Linux X11, then Wayland (transparency and click-through are the likely problems)
 - [ ] confirm `create-vite` doesn't stop on a prompt when stdin is closed
-- [ ] github actions: cargo test, clippy, tsc on all three OSes
+- [x] github actions: cargo test, clippy, tsc on Windows and macOS (Linux later)
+- [x] macOS build: transparent window (private API), menu bar only, PATH from the login shell, VS Code via `open -a`
+- [x] release workflow: tag v* builds .exe, .msi and both .dmg files with fixed names, README and site link to them
 - [ ] try the API-key brain end to end with a real key
-- [ ] get `astro check` working under pnpm 11
+- [x] replace `astro check` with Next.js build and TypeScript checks
 - [ ] dragging across screens (right now you drag within one screen, he flies across on his own)
 
 ## v0.2 - feels alive

@@ -8,7 +8,22 @@ Some things you could ask:
 > "start a Postgres container for local dev"
 > "what's running on port 3000?"
 
-Press `Ctrl+Shift+Space` or click him, type what you want, and he does it. Anything that changes your machine shows you the exact command first. Some commands he won't run at all.
+Press `Ctrl+Shift+Space` (`Cmd+Shift+Space` on a Mac) or click him, type what you want, and he does it. Anything that changes your machine shows you the exact command first. Some commands he won't run at all.
+
+## Download
+
+- Windows: [installer (.exe)](https://github.com/Abuhurera00/boltie/releases/latest/download/Boltie-windows-x64-setup.exe) or [.msi](https://github.com/Abuhurera00/boltie/releases/latest/download/Boltie-windows-x64.msi)
+- macOS, Apple silicon: [Boltie-macos-arm64.dmg](https://github.com/Abuhurera00/boltie/releases/latest/download/Boltie-macos-arm64.dmg)
+- macOS, Intel: [Boltie-macos-x64.dmg](https://github.com/Abuhurera00/boltie/releases/latest/download/Boltie-macos-x64.dmg)
+
+All versions are on the [releases page](https://github.com/Abuhurera00/boltie/releases). macOS 11 or newer.
+
+The builds aren't signed yet, so the first launch needs one extra step:
+
+- Windows: SmartScreen says "Windows protected your PC". Click "More info", then "Run anyway".
+- macOS: drag Boltie to Applications. If macOS says the app is damaged or can't be checked, run `xattr -dr com.apple.quarantine /Applications/Boltie.app` once, or allow it under System Settings > Privacy & Security.
+
+On macOS he lives in the menu bar, not the Dock.
 
 ## Brains
 
@@ -51,14 +66,19 @@ pnpm install
 pnpm dev          # desktop app
 pnpm web          # landing page
 cargo test --workspace
+pnpm build        # installers for the OS you're on, in target/release/bundle
 ```
+
+On macOS you also need the Xcode command line tools (`xcode-select --install`).
+
+To publish a release, push a tag like `v0.1.0`. GitHub Actions builds the Windows and macOS installers and attaches them to the release with the names linked above.
 
 ## Repo layout
 
 ```
 crates/boltie-core   agent loop, tools, safety policy, providers (no Tauri)
 apps/desktop         Tauri 2 app, three.js robot, the card UI
-apps/web             landing page (Astro)
+apps/web             landing page (Next.js static export)
 skills/              skills that ship with the app
 vault/               project notes, open it in Obsidian
 ```

@@ -61,6 +61,71 @@ pub fn which(program: &str) -> Option<PathBuf> {
     None
 }
 
+/// Apps started from Finder or the Dock get a bare PATH (`/usr/bin:/bin:...`),
+/// so `claude`, `code`, `docker` and Homebrew tools can't be found. Ask the
+/// user's login shell for its PATH once at startup, and add the usual install
+/// folders in case that fails. Does nothing on Windows.
+pub fn fix_gui_path() {
+    if cfg!(windows) {
+        return;
+    }
+    let mut paths: Vec<PathBuf> = env::var_os("PATH").map(|p| env::split_paths(&p).collect()).unwrap_or_default();
+    let mut add = |dir: PathBuf| {
+        if !dir.as_os_str().is_empty() && !paths.contains(&dir) {
+            paths.push(dir);
+        }
+    };
+
+    if let Some(path) = login_shell_path() {
+        env::split_paths(&path).for_each(&mut add);
+    }
+    for dir in ["/opt/homebrew/bin", "/usr/local/bin"] {
+        add(PathBuf::from(dir));
+    }
+    if let Some(home) = dirs::home_dir() {
+        for dir in [".local/bin", ".claude/local", ".npm-global/bin", ".bun/bin", ".cargo/bin"] {
+            add(home.join(dir));
+        }
+    }
+
+    if let Ok(joined) = env::join_paths(&paths) {
+        env::set_var("PATH", joined);
+    }
+}
+
+/// PATH as the user's interactive login shell sees it, or None after 3 seconds.
+fn login_shell_path() -> Option<String> {
+    const MARK: &str = "__boltie_path__";
+    let shell = env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".into());
+    let mut child = std::process::Command::new(shell)
+        .args(["-ilc", &format!("printf '{MARK}%s{MARK}' \"$PATH\"")])
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .ok()?;
+
+    let deadline = std::time::Instant::now() + Duration::from_secs(3);
+    while child.try_wait().ok()?.is_none() {
+        if std::time::Instant::now() > deadline {
+            let _ = child.kill();
+            return None;
+        }
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    let mut out = String::new();
+    std::io::Read::read_to_string(&mut child.stdout.take()?, &mut out).ok()?;
+    between_marks(&out, MARK)
+}
+
+/// Rc files can print banners, so only trust what sits between the markers.
+fn between_marks(text: &str, mark: &str) -> Option<String> {
+    let start = text.find(mark)? + mark.len();
+    let end = start + text[start..].find(mark)?;
+    let path = text[start..end].trim();
+    (!path.is_empty()).then(|| path.to_string())
+}
+
 /// The shell the model should write commands for.
 #[derive(Debug, Clone)]
 pub struct Shell {
@@ -225,6 +290,14 @@ mod tests {
     fn clip_respects_utf8() {
         let long = "é".repeat(MAX_OUTPUT_BYTES);
         let _ = clip(long.as_bytes());
+    }
+
+    #[test]
+    fn login_path_ignores_shell_banners() {
+        let out = "Welcome back!\n__m__/opt/homebrew/bin:/usr/bin__m__";
+        assert_eq!(between_marks(out, "__m__").as_deref(), Some("/opt/homebrew/bin:/usr/bin"));
+        assert_eq!(between_marks("no markers here", "__m__"), None);
+        assert_eq!(between_marks("__m____m__", "__m__"), None);
     }
 
     #[tokio::test]

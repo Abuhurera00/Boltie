@@ -27,6 +27,9 @@ fn main() {
         )
         .init();
 
+    // Before any thread starts: Finder-launched apps can't see Homebrew or npm.
+    boltie_core::sys::fix_gui_path();
+
     tauri::Builder::default()
         // A second launch just summons the first one.
         .plugin(tauri_plugin_single_instance::init(|app, _, _| summon(app)))
@@ -51,6 +54,10 @@ fn main() {
             display::set_home_screen,
         ])
         .setup(|app| {
+            // A menu bar app on macOS: no Dock icon, no app switcher entry.
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+
             let handle = app.handle().clone();
 
             let hit = HitTester::default();
