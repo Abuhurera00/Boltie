@@ -15,3 +15,6 @@ apps/desktop/src-tauri/gen/
 .DS_Store
 vault/.obsidian/workspace*.json
 vault/.obsidian/cache
+
+# big source renders, the site uses compressed copies in apps/web/public/video
+video/*.mp4
