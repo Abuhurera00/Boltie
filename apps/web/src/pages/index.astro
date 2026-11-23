@@ -1,0 +1,140 @@
+---
+import Base from "../layouts/Base.astro";
+
+const repo = "https://github.com/abuhurera00/boltie";
+
+const chores = [
+  "open my-app in vs code",
+  "start a postgres container for local dev",
+  "what's running on port 3000?",
+];
+---
+
+<Base title="Boltie - say it, Boltie does it" description="A tiny open-source robot that walks along your taskbar and does your computer chores. Asks before anything risky.">
+  <main>
+    <header>
+      <img src="/favicon.svg" alt="" width="56" height="56" />
+      <h1>Boltie</h1>
+      <p class="lead">A tiny robot that lives on your taskbar and does the boring computer stuff for you.</p>
+      <p class="actions">
+        <a class="button" href={`${repo}/releases/latest`}>Download</a>
+        <a href={repo}>Source on GitHub</a>
+      </p>
+    </header>
+
+    <section>
+      <h2>Things you can tell it</h2>
+      <ul class="chores">
+        {chores.map((c) => <li><code>"{c}"</code></li>)}
+      </ul>
+      <p class="muted">Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> or click the robot, type, done.</p>
+    </section>
+
+    <section class="grid">
+      <div>
+        <h3>Asks before it touches anything</h3>
+        <p>Looking things up happens straight away. Anything that changes your machine shows you the exact command first. Some commands it simply won't run.</p>
+      </div>
+      <div>
+        <h3>Uses the Claude you already have</h3>
+        <p>Paste an Anthropic API key, or let it use your Claude Code login. Nothing to download beyond the app.</p>
+      </div>
+      <div>
+        <h3>Skills are just markdown</h3>
+        <p>Write down a routine like "start my dev setup" as a few steps in a <code>.md</code> file and Boltie follows it.</p>
+      </div>
+      <div>
+        <h3>Small and open</h3>
+        <p>Built with Rust and Tauri, MIT licensed. Windows first, macOS and Linux next.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Build it yourself</h2>
+      <pre><code>git clone {repo}
+cd boltie
+pnpm install
+pnpm dev</code></pre>
+    </section>
+  </main>
+
+  <footer>
+    <p class="muted">MIT licensed. Not affiliated with Anthropic.</p>
+  </footer>
+</Base>
+
+<style>
+  main,
+  footer {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  header {
+    padding: 72px 0 40px;
+  }
+  h1 {
+    font-size: 48px;
+    margin: 12px 0 4px;
+  }
+  .lead {
+    font-size: 21px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 28px;
+  }
+  .button {
+    background: var(--accent);
+    color: #1b2130;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  section {
+    padding: 28px 0;
+    border-top: 1px solid var(--line);
+  }
+  .chores {
+    padding-left: 18px;
+  }
+  .chores li {
+    margin: 6px 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 8px 32px;
+  }
+  .grid h3 {
+    margin-bottom: 4px;
+  }
+  .grid p {
+    margin-top: 0;
+    color: var(--muted);
+  }
+  pre {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    overflow-x: auto;
+  }
+  kbd {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0 5px;
+    font-size: 0.85em;
+  }
+  .muted {
+    color: var(--muted);
+  }
+  footer {
+    padding-bottom: 40px;
+  }
+</style>

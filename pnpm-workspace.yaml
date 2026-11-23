@@ -1,0 +1,7 @@
+packages:
+  - "apps/*"
+
+# Native binaries the web and desktop toolchains need to install.
+allowBuilds:
+  esbuild: true
+  sharp: true

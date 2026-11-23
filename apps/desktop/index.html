@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boltie</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="glow"></div>
+    <canvas id="stage"></canvas>
+
+    <section id="dock" class="card hidden" aria-live="polite">
+      <button type="button" class="dock-close" id="dock-close" title="Close" aria-label="Close"></button>
+      <div class="view" id="view-chat">
+        <div class="chat-log" id="chat-log"></div>
+        <form class="chat-bar" id="chat-bar" autocomplete="off">
+          <button type="button" class="icon-btn" id="new-chat" title="New conversation" aria-label="New conversation"></button>
+          <input id="chat-input" type="text" spellcheck="false" />
+          <button type="button" class="icon-btn" id="open-settings" title="Settings" aria-label="Settings"></button>
+          <button type="submit" class="send-btn" id="send" aria-label="Send"></button>
+        </form>
+      </div>
+
+      <div class="view" id="view-approval" role="alertdialog" aria-labelledby="ap-title">
+        <div class="who-row">
+          <span class="dot"></span>
+          <span class="who" id="ap-who"></span>
+          <span class="dim">needs permission</span>
+          <span class="risk-pill" id="ap-risk"></span>
+        </div>
+        <div class="ap-title" id="ap-title"></div>
+        <pre class="code" id="ap-code"></pre>
+        <div class="ap-cwd" id="ap-cwd"></div>
+        <div class="actions">
+          <button type="button" class="btn secondary" id="ap-deny">Deny <span class="kbd">N</span></button>
+          <button type="button" class="btn primary" id="ap-allow">Allow <span class="kbd" id="ap-allow-kbd">Y</span></button>
+        </div>
+      </div>
+
+      <form class="view" id="view-settings" autocomplete="off">
+        <div class="settings-head">
+          <strong>Settings</strong>
+          <span class="dim" id="settings-skills"></span>
+        </div>
+
+        <div class="segmented" role="radiogroup" aria-label="Brain">
+          <label><input type="radio" name="provider" value="claude_cli" /><span>Claude Code login</span></label>
+          <label><input type="radio" name="provider" value="anthropic_api" /><span>API key</span></label>
+        </div>
+        <p class="hint" id="cli-status"></p>
+
+        <div data-for="anthropic_api">
+          <label class="field">
+            <span>Anthropic API key</span>
+            <input id="api-key" type="password" placeholder="sk-ant-..." />
+          </label>
+          <p class="hint" id="key-status"></p>
+          <div class="row">
+            <label class="field"><span>Model</span><input id="model" type="text" /></label>
+            <label class="field narrow">
+              <span>Effort</span>
+              <select id="effort">
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>Project folders, one per line</span>
+          <textarea id="roots" rows="2" placeholder="Empty = ~/projects, ~/code, Desktop, Documents, D:\ ..."></textarea>
+        </label>
+        <label class="field" id="screen-field">
+          <span>Screen</span>
+          <select id="screen"></select>
+        </label>
+        <div class="row">
+          <label class="field"><span>Editor command</span><input id="editor" type="text" /></label>
+          <label class="field narrow">
+            <span>Sounds</span>
+            <select id="volume">
+              <option value="0">off</option>
+              <option value="0.06">quiet</option>
+              <option value="0.12">normal</option>
+              <option value="0.2">loud</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="error" id="settings-error"></p>
+        <div class="actions">
+          <button type="button" class="btn quiet" id="settings-quit">Quit Boltie</button>
+          <span class="spacer"></span>
+          <button type="button" class="btn secondary" id="settings-close">Close</button>
+          <button type="submit" class="btn primary">Save</button>
+        </div>
+      </form>
+
+      <div class="countdown" id="countdown"></div>
+    </section>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

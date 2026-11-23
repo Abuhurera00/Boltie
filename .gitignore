@@ -1,0 +1,11 @@
+/target
+node_modules/
+dist/
+.astro/
+apps/desktop/src-tauri/gen/
+.env
+.env.*
+*.log
+.DS_Store
+vault/.obsidian/workspace*.json
+vault/.obsidian/cache
