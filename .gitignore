@@ -16,5 +16,11 @@ apps/desktop/src-tauri/gen/
 vault/.obsidian/workspace*.json
 vault/.obsidian/cache
 
-# big source renders, the site uses compressed copies in apps/web/public/video
+# Local agent tooling and the unused design-kit reference library
+.agents/
+.claude/
+.codex/
+apps/web/public/assets/
+
+# Large marketing-film renders are kept out of the website and repository
 video/*.mp4
